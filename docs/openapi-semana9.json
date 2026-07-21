@@ -1,0 +1,4157 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MiniMarket Plus API",
+    "description": "API REST de MiniMarket Plus para autenticación, catálogo, carritos, inventario, ventas, sucursales, stock por sucursal, proveedores, órdenes de compra, pedidos, promociones y reportes. Protegida mediante JWT y enriquecida con enlaces HATEOAS.",
+    "contact": {
+      "name": "Equipo MiniMarket Plus"
+    },
+    "version": "2.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Servidor local"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Usuarios",
+      "description": "Administración de clientes y roles del sistema."
+    },
+    {
+      "name": "Stock por sucursal",
+      "description": "Disponibilidad y movimientos de stock por sucursal."
+    },
+    {
+      "name": "Público",
+      "description": "Endpoint público para comprobar el estado del servicio."
+    },
+    {
+      "name": "Reportes",
+      "description": "Reportes administrativos de rotación, stock y reposición."
+    },
+    {
+      "name": "Categorías",
+      "description": "Clasificación de los productos."
+    },
+    {
+      "name": "Inventario",
+      "description": "Registro y consulta de movimientos de stock."
+    },
+    {
+      "name": "Órdenes de compra",
+      "description": "Órdenes automáticas de reposición a proveedores."
+    },
+    {
+      "name": "Productos",
+      "description": "Gestión completa del catálogo de productos."
+    },
+    {
+      "name": "Ventas",
+      "description": "Consulta y registro de ventas."
+    },
+    {
+      "name": "Proveedores",
+      "description": "Administración de proveedores."
+    },
+    {
+      "name": "Pedidos en línea",
+      "description": "Pedidos para retiro en tienda o despacho a domicilio."
+    },
+    {
+      "name": "Carrito",
+      "description": "Operaciones para administrar productos del carrito con control de propietario."
+    },
+    {
+      "name": "Sucursales",
+      "description": "Gestión y consulta de sucursales."
+    },
+    {
+      "name": "Detalle de ventas",
+      "description": "Consulta de productos asociados a ventas."
+    },
+    {
+      "name": "Promociones",
+      "description": "Gestión centralizada de ofertas y promociones."
+    },
+    {
+      "name": "Autenticación",
+      "description": "Inicio de sesión y generación de tokens JWT"
+    }
+  ],
+  "paths": {
+    "/api/usuarios/{id}": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener usuario",
+        "description": "Busca un usuario por su identificador.",
+        "operationId": "obtenerUsuarioPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del usuario",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Usuario"
+                },
+                "example": {
+                  "id": 2,
+                  "username": "cliente",
+                  "correo": "cliente@minimarket.local",
+                  "roles": [
+                    {
+                      "id": 2,
+                      "nombre": "ROLE_CLIENTE"
+                    }
+                  ],
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/usuarios/2"
+                    },
+                    "usuarios": {
+                      "href": "http://localhost:8080/api/usuarios"
+                    },
+                    "carrito": {
+                      "href": "http://localhost:8080/api/carrito"
+                    },
+                    "ventas": {
+                      "href": "http://localhost:8080/api/ventas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Actualizar usuario",
+        "description": "Modifica los datos y roles de un usuario existente.",
+        "operationId": "actualizarUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del usuario",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Usuario"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelUsuario"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Eliminar usuario",
+        "description": "Elimina un usuario registrado.",
+        "operationId": "eliminarUsuario",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del usuario",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Usuario eliminado"
+          },
+          "404": {
+            "description": "Usuario no encontrado"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      }
+    },
+    "/api/sucursales/{id}": {
+      "get": {
+        "tags": [
+          "Sucursales"
+        ],
+        "operationId": "obtener",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la sucursal",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucursal encontrada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelSucursal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Sucursal no encontrada"
+          }
+        },
+        "summary": "Obtener sucursal",
+        "description": "Obtiene una sucursal por su identificador."
+      },
+      "put": {
+        "tags": [
+          "Sucursales"
+        ],
+        "operationId": "actualizar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la sucursal",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sucursal"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos actualizados de la sucursal"
+        },
+        "responses": {
+          "200": {
+            "description": "Sucursal actualizada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelSucursal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Sucursal no encontrada"
+          },
+          "409": {
+            "description": "Nombre de sucursal duplicado"
+          }
+        },
+        "summary": "Actualizar sucursal",
+        "description": "Actualiza los datos de una sucursal existente. Requiere ROLE_ADMIN."
+      },
+      "delete": {
+        "tags": [
+          "Sucursales"
+        ],
+        "operationId": "eliminar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la sucursal",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sucursal eliminada"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Sucursal no encontrada"
+          },
+          "409": {
+            "description": "La sucursal posee relaciones activas"
+          }
+        },
+        "summary": "Eliminar sucursal",
+        "description": "Elimina una sucursal existente. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/proveedores/{id}": {
+      "get": {
+        "tags": [
+          "Proveedores"
+        ],
+        "operationId": "obtener_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del proveedor",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Proveedor encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelProveedor"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Proveedor no encontrado"
+          }
+        },
+        "summary": "Obtener proveedor",
+        "description": "Obtiene un proveedor por su identificador. Requiere ROLE_ADMIN."
+      },
+      "put": {
+        "tags": [
+          "Proveedores"
+        ],
+        "operationId": "actualizar_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del proveedor",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Proveedor"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos actualizados del proveedor"
+        },
+        "responses": {
+          "200": {
+            "description": "Proveedor actualizado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelProveedor"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Proveedor no encontrado"
+          },
+          "409": {
+            "description": "Correo de proveedor duplicado"
+          }
+        },
+        "summary": "Actualizar proveedor",
+        "description": "Actualiza un proveedor existente. Requiere ROLE_ADMIN."
+      },
+      "delete": {
+        "tags": [
+          "Proveedores"
+        ],
+        "operationId": "eliminar_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del proveedor",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Proveedor eliminado"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Proveedor no encontrado"
+          },
+          "409": {
+            "description": "El proveedor posee órdenes relacionadas"
+          }
+        },
+        "summary": "Eliminar proveedor",
+        "description": "Elimina un proveedor existente. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/promociones/{id}": {
+      "get": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "obtener_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la promoción",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Promoción encontrada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPromocion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Promoción no encontrada"
+          }
+        },
+        "summary": "Obtener promoción",
+        "description": "Obtiene una promoción por su identificador. Requiere ROLE_ADMIN."
+      },
+      "put": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "actualizar_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la promoción",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos actualizados de la promoción"
+        },
+        "responses": {
+          "200": {
+            "description": "Promoción actualizada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPromocion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos o fechas inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Promoción o producto no encontrado"
+          }
+        },
+        "summary": "Actualizar promoción",
+        "description": "Actualiza una promoción existente. Requiere ROLE_ADMIN."
+      },
+      "delete": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "eliminar_2",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la promoción",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Promoción eliminada"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Promoción no encontrada"
+          }
+        },
+        "summary": "Eliminar promoción",
+        "description": "Elimina una promoción existente. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/productos/{id}": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Obtener producto",
+        "description": "Busca un producto por su identificador.",
+        "operationId": "obtenerProductoPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del producto",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Producto encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Producto"
+                },
+                "example": {
+                  "id": 1,
+                  "nombre": "Arroz 1 kg",
+                  "precio": 1890.0,
+                  "stock": 40,
+                  "categoria": {
+                    "id": 1,
+                    "nombre": "Abarrotes"
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    },
+                    "productos": {
+                      "href": "http://localhost:8080/api/productos"
+                    },
+                    "categoria": {
+                      "href": "http://localhost:8080/api/categorias/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Actualizar producto",
+        "description": "Reemplaza los datos de un producto existente.",
+        "operationId": "actualizarProducto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del producto",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Producto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Producto actualizado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelProducto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Eliminar producto",
+        "description": "Elimina un producto del catálogo.",
+        "operationId": "eliminarProducto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del producto",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Producto eliminado"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      }
+    },
+    "/api/pedidos/{id}/estado": {
+      "put": {
+        "tags": [
+          "Pedidos en línea"
+        ],
+        "operationId": "estado",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del pedido",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PedidoEstadoRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Nuevo estado del pedido"
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPedido"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Estado inválido"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Pedido no encontrado"
+          }
+        },
+        "summary": "Actualizar estado de pedido",
+        "description": "Actualiza el estado operativo de un pedido. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/categorias/{id}": {
+      "get": {
+        "tags": [
+          "Categorías"
+        ],
+        "summary": "Obtener categoría",
+        "operationId": "obtenerCategoriaPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador de la categoría",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoría encontrada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Categoría no encontrada"
+          }
+        },
+        "description": "Obtiene una categoría por su identificador."
+      },
+      "put": {
+        "tags": [
+          "Categorías"
+        ],
+        "summary": "Actualizar categoría",
+        "operationId": "actualizarCategoria",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la categoría",
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Categoria"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos actualizados de la categoría"
+        },
+        "responses": {
+          "200": {
+            "description": "Categoría actualizada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Categoría no encontrada"
+          },
+          "409": {
+            "description": "Nombre de categoría duplicado"
+          }
+        },
+        "description": "Actualiza una categoría existente. Requiere ROLE_ADMIN."
+      },
+      "delete": {
+        "tags": [
+          "Categorías"
+        ],
+        "summary": "Eliminar categoría",
+        "operationId": "eliminarCategoria",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la categoría",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Categoría eliminada"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Categoría no encontrada"
+          },
+          "409": {
+            "description": "La categoría posee productos relacionados"
+          }
+        },
+        "description": "Elimina una categoría existente. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/carrito/{id}": {
+      "get": {
+        "tags": [
+          "Carrito"
+        ],
+        "summary": "Obtener registro del carrito",
+        "description": "ROLE_CLIENTE solo puede obtener registros propios; ROLE_ADMIN puede obtener cualquiera.",
+        "operationId": "obtenerCarritoPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del registro",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Registro encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Carrito"
+                },
+                "example": {
+                  "id": 1,
+                  "usuario": {
+                    "id": 2,
+                    "username": "cliente",
+                    "roles": [
+                      {
+                        "id": 2,
+                        "nombre": "ROLE_CLIENTE"
+                      }
+                    ]
+                  },
+                  "producto": {
+                    "id": 1,
+                    "nombre": "Arroz 1 kg",
+                    "precio": 1890.0,
+                    "stock": 40,
+                    "categoria": {
+                      "id": 1,
+                      "nombre": "Abarrotes"
+                    }
+                  },
+                  "cantidad": 2,
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/carrito/1"
+                    },
+                    "carrito": {
+                      "href": "http://localhost:8080/api/carrito"
+                    },
+                    "usuario": {
+                      "href": "http://localhost:8080/api/usuarios/2"
+                    },
+                    "producto": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "El carrito pertenece a otro usuario"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Carrito"
+        ],
+        "summary": "Actualizar registro del carrito",
+        "description": "ROLE_CLIENTE solo puede modificar registros propios; ROLE_ADMIN puede modificar cualquiera.",
+        "operationId": "actualizarCarrito",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del registro",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Carrito"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Registro actualizado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelCarrito"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "El carrito pertenece a otro usuario"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Carrito"
+        ],
+        "summary": "Eliminar producto del carrito",
+        "description": "ROLE_CLIENTE solo puede eliminar registros propios; ROLE_ADMIN puede eliminar cualquiera.",
+        "operationId": "eliminarProductoDelCarrito",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del registro",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Registro eliminado"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "El carrito pertenece a otro usuario"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          }
+        }
+      }
+    },
+    "/api/ventas": {
+      "get": {
+        "tags": [
+          "Ventas"
+        ],
+        "summary": "Listar ventas",
+        "description": "Obtiene las ventas registradas con enlaces HATEOAS.",
+        "operationId": "listarVentas",
+        "responses": {
+          "200": {
+            "description": "Ventas obtenidas correctamente",
+            "content": {
+              "application/hal+json": {}
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Ventas"
+        ],
+        "summary": "Registrar venta",
+        "description": "Valida productos y stock, descuenta inventario, registra movimientos y detalles en una transacción.",
+        "operationId": "guardarVenta",
+        "requestBody": {
+          "description": "Detalles de productos vendidos. El usuario se obtiene del token.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VentaRequest"
+              },
+              "example": {
+                "detalles": [
+                  {
+                    "productoId": 1,
+                    "cantidad": 2
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Venta registrada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Venta"
+                },
+                "example": {
+                  "id": 1,
+                  "usuario": {
+                    "id": 3,
+                    "username": "cajero",
+                    "roles": [
+                      {
+                        "id": 3,
+                        "nombre": "ROLE_CAJERO"
+                      }
+                    ]
+                  },
+                  "fecha": "2026-07-13T20:00:00.000+00:00",
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/ventas/1"
+                    },
+                    "ventas": {
+                      "href": "http://localhost:8080/api/ventas"
+                    },
+                    "detalle-ventas": {
+                      "href": "http://localhost:8080/api/ventas/1/detalles"
+                    },
+                    "inventario": {
+                      "href": "http://localhost:8080/api/inventario"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Usuario o producto no encontrado"
+          },
+          "409": {
+            "description": "Stock insuficiente"
+          }
+        }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Listar usuarios",
+        "description": "Obtiene los usuarios registrados con enlaces HATEOAS.",
+        "operationId": "listarUsuarios",
+        "responses": {
+          "200": {
+            "description": "Usuarios obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "_embedded": {
+                    "usuarioList": [
+                      {
+                        "id": 2,
+                        "username": "cliente",
+                        "correo": "cliente@minimarket.local",
+                        "_links": {
+                          "self": {
+                            "href": "http://localhost:8080/api/usuarios/2"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/usuarios"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Crear usuario",
+        "description": "Registra un usuario y cifra su contraseña.",
+        "operationId": "guardarUsuario",
+        "requestBody": {
+          "description": "Datos y roles del usuario",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Usuario"
+              },
+              "example": {
+                "username": "nuevoCliente",
+                "correo": "nuevo.cliente@minimarket.local",
+                "password": "clave123",
+                "roles": [
+                  {
+                    "id": 2
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "id": 2,
+                  "username": "cliente",
+                  "correo": "cliente@minimarket.local",
+                  "roles": [
+                    {
+                      "id": 2,
+                      "nombre": "ROLE_CLIENTE"
+                    }
+                  ],
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/usuarios/2"
+                    },
+                    "usuarios": {
+                      "href": "http://localhost:8080/api/usuarios"
+                    },
+                    "carrito": {
+                      "href": "http://localhost:8080/api/carrito"
+                    },
+                    "ventas": {
+                      "href": "http://localhost:8080/api/ventas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos o roles inválidos"
+          },
+          "409": {
+            "description": "El nombre de usuario ya existe"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      }
+    },
+    "/api/sucursales": {
+      "get": {
+        "tags": [
+          "Sucursales"
+        ],
+        "summary": "Listar sucursales",
+        "operationId": "listar",
+        "responses": {
+          "200": {
+            "description": "Sucursales obtenidas correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelSucursal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        },
+        "description": "Obtiene las sucursales registradas y enlaces HATEOAS hacia su stock."
+      },
+      "post": {
+        "tags": [
+          "Sucursales"
+        ],
+        "operationId": "crear",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Sucursal"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos de la sucursal"
+        },
+        "responses": {
+          "201": {
+            "description": "Sucursal creada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelSucursal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nombre o dirección inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "409": {
+            "description": "Nombre de sucursal duplicado"
+          }
+        },
+        "summary": "Crear sucursal",
+        "description": "Crea una sucursal. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/stock-sucursales": {
+      "get": {
+        "tags": [
+          "Stock por sucursal"
+        ],
+        "operationId": "listar_1",
+        "responses": {
+          "200": {
+            "description": "Stock obtenido correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelStockSucursal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        },
+        "summary": "Listar stock por sucursal",
+        "description": "Obtiene todas las existencias configuradas por sucursal y producto."
+      },
+      "post": {
+        "tags": [
+          "Stock por sucursal"
+        ],
+        "operationId": "registrar",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockSucursalRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Sucursal, producto, cantidad, tipo de movimiento y stock mínimo opcional"
+        },
+        "responses": {
+          "201": {
+            "description": "Movimiento registrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelStockSucursal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos, cantidad o tipo de movimiento inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Sucursal o producto no encontrado"
+          },
+          "409": {
+            "description": "Stock insuficiente"
+          }
+        },
+        "summary": "Registrar movimiento de stock por sucursal",
+        "description": "Registra una ENTRADA o SALIDA. Una salida que alcanza el mínimo puede generar una orden automática. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/proveedores": {
+      "get": {
+        "tags": [
+          "Proveedores"
+        ],
+        "operationId": "listar_2",
+        "responses": {
+          "200": {
+            "description": "Proveedores obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelProveedor"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Listar proveedores",
+        "description": "Obtiene todos los proveedores. Requiere ROLE_ADMIN."
+      },
+      "post": {
+        "tags": [
+          "Proveedores"
+        ],
+        "operationId": "crear_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Proveedor"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos del proveedor"
+        },
+        "responses": {
+          "201": {
+            "description": "Proveedor creado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelProveedor"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Nombre o correo inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "409": {
+            "description": "Correo de proveedor duplicado"
+          }
+        },
+        "summary": "Crear proveedor",
+        "description": "Registra un proveedor. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/promociones": {
+      "get": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "listar_3",
+        "responses": {
+          "200": {
+            "description": "Promociones obtenidas correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelPromocion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Listar promociones",
+        "description": "Obtiene todas las promociones. Requiere ROLE_ADMIN."
+      },
+      "post": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "crear_2",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromocionRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos de la promoción"
+        },
+        "responses": {
+          "201": {
+            "description": "Promoción creada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPromocion"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos o fechas inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          }
+        },
+        "summary": "Crear promoción",
+        "description": "Registra una promoción para un producto. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/productos": {
+      "get": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Listar productos",
+        "description": "Obtiene todos los productos con enlaces HATEOAS.",
+        "operationId": "listarProductos",
+        "responses": {
+          "200": {
+            "description": "Productos obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "_embedded": {
+                    "productoList": [
+                      {
+                        "id": 1,
+                        "nombre": "Arroz 1 kg",
+                        "precio": 1890.0,
+                        "stock": 40,
+                        "_links": {
+                          "self": {
+                            "href": "http://localhost:8080/api/productos/1"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/productos"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "summary": "Crear producto",
+        "description": "Agrega un producto al catálogo.",
+        "operationId": "guardarProducto",
+        "requestBody": {
+          "description": "Datos del nuevo producto",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Producto"
+              },
+              "example": {
+                "nombre": "Aceite vegetal 1 L",
+                "precio": 2490.0,
+                "stock": 30,
+                "categoria": {
+                  "id": 1
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Producto creado",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "id": 1,
+                  "nombre": "Arroz 1 kg",
+                  "precio": 1890.0,
+                  "stock": 40,
+                  "categoria": {
+                    "id": 1,
+                    "nombre": "Abarrotes"
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    },
+                    "productos": {
+                      "href": "http://localhost:8080/api/productos"
+                    },
+                    "categoria": {
+                      "href": "http://localhost:8080/api/categorias/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos del producto inválidos"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          }
+        }
+      }
+    },
+    "/api/pedidos": {
+      "get": {
+        "tags": [
+          "Pedidos en línea"
+        ],
+        "operationId": "listar_4",
+        "responses": {
+          "200": {
+            "description": "Pedidos obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelPedido"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        },
+        "summary": "Listar pedidos",
+        "description": "ROLE_CLIENTE obtiene sus pedidos; ROLE_ADMIN obtiene todos."
+      },
+      "post": {
+        "tags": [
+          "Pedidos en línea"
+        ],
+        "operationId": "crear_3",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PedidoRequest"
+              }
+            }
+          },
+          "required": true,
+          "description": "Sucursal, tipo de entrega, dirección cuando corresponda y detalles del pedido"
+        },
+        "responses": {
+          "201": {
+            "description": "Pedido creado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPedido"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos, cantidades o dirección inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Sucursal, producto o stock no encontrado"
+          },
+          "409": {
+            "description": "Stock insuficiente"
+          }
+        },
+        "summary": "Crear pedido",
+        "description": "Crea un pedido para retiro o despacho, aplica promociones vigentes y descuenta stock por sucursal."
+      }
+    },
+    "/api/ordenes-compra/{id}/recibir": {
+      "post": {
+        "tags": [
+          "Órdenes de compra"
+        ],
+        "operationId": "recibir",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la orden",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orden recibida y stock repuesto",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La orden no está pendiente"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Orden o stock asociado no encontrado"
+          }
+        },
+        "summary": "Recibir orden de compra",
+        "description": "Marca la orden como RECIBIDA y repone el stock de la sucursal dentro de una transacción."
+      }
+    },
+    "/api/ordenes-compra/{id}/cancelar": {
+      "post": {
+        "tags": [
+          "Órdenes de compra"
+        ],
+        "operationId": "cancelar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la orden",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orden cancelada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "La orden no está pendiente"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Orden no encontrada"
+          }
+        },
+        "summary": "Cancelar orden de compra",
+        "description": "Marca una orden pendiente como CANCELADA. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/inventario": {
+      "get": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Listar movimientos",
+        "description": "Obtiene el historial de movimientos de inventario con enlaces HATEOAS.",
+        "operationId": "listarMovimientosDeInventario",
+        "responses": {
+          "200": {
+            "description": "Movimientos obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "_embedded": {
+                    "inventarioList": [
+                      {
+                        "id": 1,
+                        "cantidad": 40,
+                        "tipoMovimiento": "ENTRADA",
+                        "_links": {
+                          "self": {
+                            "href": "http://localhost:8080/api/inventario/1"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/inventario"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Registrar movimiento",
+        "description": "Crea un nuevo movimiento inmutable, actualiza el stock del producto y evita stock negativo.",
+        "operationId": "registrarMovimiento",
+        "requestBody": {
+          "description": "Identificador de producto, cantidad y tipo de movimiento",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InventarioRequest"
+              },
+              "example": {
+                "productoId": 1,
+                "cantidad": 10,
+                "tipoMovimiento": "ENTRADA"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Movimiento registrado",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "id": 1,
+                  "producto": {
+                    "id": 1,
+                    "nombre": "Arroz 1 kg",
+                    "precio": 1890.0,
+                    "stock": 40,
+                    "categoria": {
+                      "id": 1,
+                      "nombre": "Abarrotes"
+                    }
+                  },
+                  "cantidad": 40,
+                  "tipoMovimiento": "ENTRADA",
+                  "fechaMovimiento": "2026-07-13T20:00:00.000+00:00",
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/inventario/1"
+                    },
+                    "inventario": {
+                      "href": "http://localhost:8080/api/inventario"
+                    },
+                    "producto": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos invalidos"
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "El usuario no posee rol administrador"
+          },
+          "404": {
+            "description": "Producto no encontrado"
+          },
+          "409": {
+            "description": "Stock insuficiente"
+          }
+        }
+      }
+    },
+    "/api/categorias": {
+      "get": {
+        "tags": [
+          "Categorías"
+        ],
+        "summary": "Listar categorías",
+        "operationId": "listarCategorias",
+        "responses": {
+          "200": {
+            "description": "Categorías obtenidas correctamente",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Categoria"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        },
+        "description": "Obtiene las categorías disponibles para clasificar productos."
+      },
+      "post": {
+        "tags": [
+          "Categorías"
+        ],
+        "summary": "Crear categoría",
+        "operationId": "guardarCategoria",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Categoria"
+              }
+            }
+          },
+          "required": true,
+          "description": "Datos de la categoría"
+        },
+        "responses": {
+          "201": {
+            "description": "Categoría creada",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/Categoria"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "409": {
+            "description": "Nombre de categoría duplicado"
+          }
+        },
+        "description": "Crea una categoría. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/carrito": {
+      "get": {
+        "tags": [
+          "Carrito"
+        ],
+        "summary": "Listar carrito",
+        "description": "ROLE_CLIENTE obtiene solo sus registros; ROLE_ADMIN obtiene todos los carritos.",
+        "operationId": "listarCarrito",
+        "responses": {
+          "200": {
+            "description": "Carrito obtenido correctamente",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "_embedded": {
+                    "carritoList": [
+                      {
+                        "id": 1,
+                        "cantidad": 2,
+                        "_links": {
+                          "self": {
+                            "href": "http://localhost:8080/api/carrito/1"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/carrito"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Carrito"
+        ],
+        "summary": "Agregar producto al carrito",
+        "description": "ROLE_CLIENTE crea registros para su propio usuario autenticado; ROLE_ADMIN puede indicar usuario.",
+        "operationId": "agregarProductoAlCarrito",
+        "requestBody": {
+          "description": "Usuario, producto y cantidad",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Carrito"
+              },
+              "example": {
+                "usuario": {
+                  "id": 2
+                },
+                "producto": {
+                  "id": 1
+                },
+                "cantidad": 2
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Producto agregado al carrito",
+            "content": {
+              "application/hal+json": {
+                "example": {
+                  "id": 1,
+                  "usuario": {
+                    "id": 2,
+                    "username": "cliente",
+                    "roles": [
+                      {
+                        "id": 2,
+                        "nombre": "ROLE_CLIENTE"
+                      }
+                    ]
+                  },
+                  "producto": {
+                    "id": 1,
+                    "nombre": "Arroz 1 kg",
+                    "precio": 1890.0,
+                    "stock": 40,
+                    "categoria": {
+                      "id": 1,
+                      "nombre": "Abarrotes"
+                    }
+                  },
+                  "cantidad": 2,
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/carrito/1"
+                    },
+                    "carrito": {
+                      "href": "http://localhost:8080/api/carrito"
+                    },
+                    "usuario": {
+                      "href": "http://localhost:8080/api/usuarios/2"
+                    },
+                    "producto": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Registrar cliente",
+        "description": "Crea una cuenta pública solo con ROLE_CLIENTE.",
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Cliente registrado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o rol no permitido"
+          },
+          "409": {
+            "description": "Usuario o correo duplicado"
+          }
+        },
+        "security": []
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Iniciar sesión",
+        "description": "Valida las credenciales y devuelve un token Bearer JWT.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticación correcta",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Credenciales incompletas"
+          },
+          "401": {
+            "description": "Credenciales inválidas"
+          }
+        },
+        "security": []
+      }
+    },
+    "/public/hola": {
+      "get": {
+        "tags": [
+          "Público"
+        ],
+        "summary": "Comprobar disponibilidad",
+        "operationId": "holaMundo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/ventas/{ventaId}/detalles": {
+      "get": {
+        "tags": [
+          "Ventas"
+        ],
+        "summary": "Listar detalles de una venta",
+        "description": "Obtiene solo los detalles asociados a la venta indicada.",
+        "operationId": "listarDetallesDeVenta",
+        "parameters": [
+          {
+            "name": "ventaId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles de venta obtenidos",
+            "content": {
+              "application/hal+json": {}
+            }
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Venta no encontrada"
+          }
+        }
+      }
+    },
+    "/api/ventas/{id}": {
+      "get": {
+        "tags": [
+          "Ventas"
+        ],
+        "summary": "Obtener venta",
+        "description": "Busca una venta por su identificador.",
+        "operationId": "obtenerVentaPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Venta encontrada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Venta"
+                },
+                "example": {
+                  "id": 1,
+                  "usuario": {
+                    "id": 3,
+                    "username": "cajero",
+                    "roles": [
+                      {
+                        "id": 3,
+                        "nombre": "ROLE_CAJERO"
+                      }
+                    ]
+                  },
+                  "fecha": "2026-07-13T20:00:00.000+00:00",
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/ventas/1"
+                    },
+                    "ventas": {
+                      "href": "http://localhost:8080/api/ventas"
+                    },
+                    "detalle-ventas": {
+                      "href": "http://localhost:8080/api/ventas/1/detalles"
+                    },
+                    "inventario": {
+                      "href": "http://localhost:8080/api/inventario"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Venta no encontrada"
+          }
+        }
+      }
+    },
+    "/api/stock-sucursales/{sucursalId}/{productoId}/disponibilidad": {
+      "get": {
+        "tags": [
+          "Stock por sucursal"
+        ],
+        "summary": "Consultar disponibilidad de un producto en una sucursal",
+        "operationId": "disponibilidad",
+        "parameters": [
+          {
+            "name": "sucursalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la sucursal",
+            "example": 1
+          },
+          {
+            "name": "productoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del producto",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Disponibilidad obtenida",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisponibilidadSucursalResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "No existe stock del producto en la sucursal"
+          }
+        },
+        "description": "Informa stock actual, stock mínimo y disponibilidad del producto solicitado."
+      }
+    },
+    "/api/stock-sucursales/sucursal/{sucursalId}": {
+      "get": {
+        "tags": [
+          "Stock por sucursal"
+        ],
+        "operationId": "listarPorSucursal",
+        "parameters": [
+          {
+            "name": "sucursalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la sucursal",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stock de la sucursal obtenido correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelStockSucursal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Sucursal no encontrada"
+          }
+        },
+        "summary": "Listar stock de una sucursal",
+        "description": "Obtiene las existencias de todos los productos en una sucursal."
+      }
+    },
+    "/api/reportes/stock-sucursales": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "stock",
+        "responses": {
+          "200": {
+            "description": "Reporte generado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StockSucursal"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Generar reporte de stock por sucursal",
+        "description": "Obtiene las existencias y mínimos configurados para cada sucursal y producto. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/reportes/rotacion-productos": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "rotacion",
+        "responses": {
+          "200": {
+            "description": "Reporte generado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RotacionProductoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Generar reporte de rotación de productos",
+        "description": "Combina ventas y pedidos para ordenar los productos según el total de unidades movidas. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/reportes/ordenes-pendientes": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "operationId": "ordenesPendientes",
+        "responses": {
+          "200": {
+            "description": "Reporte generado",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrdenCompra"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Generar reporte de órdenes pendientes",
+        "description": "Obtiene las órdenes de reposición pendientes de recepción o cancelación. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/promociones/activas": {
+      "get": {
+        "tags": [
+          "Promociones"
+        ],
+        "operationId": "activas",
+        "responses": {
+          "200": {
+            "description": "Promociones activas obtenidas correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelPromocion"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        },
+        "summary": "Listar promociones activas",
+        "description": "Obtiene las promociones vigentes para los usuarios autenticados."
+      }
+    },
+    "/api/pedidos/{id}": {
+      "get": {
+        "tags": [
+          "Pedidos en línea"
+        ],
+        "operationId": "obtener_3",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del pedido",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Pedido encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelPedido"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Pedido no encontrado"
+          }
+        },
+        "summary": "Obtener pedido",
+        "description": "ROLE_CLIENTE solo puede consultar pedidos propios; ROLE_ADMIN puede consultar cualquiera."
+      }
+    },
+    "/api/pedidos/{id}/detalles": {
+      "get": {
+        "tags": [
+          "Pedidos en línea"
+        ],
+        "operationId": "detalles",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador del pedido",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalles obtenidos correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelDetallePedido"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Pedido no encontrado"
+          }
+        },
+        "summary": "Listar detalles de un pedido",
+        "description": "Obtiene los productos y precios asociados a un pedido accesible para el usuario autenticado."
+      }
+    },
+    "/api/ordenes-compra": {
+      "get": {
+        "tags": [
+          "Órdenes de compra"
+        ],
+        "operationId": "listar_5",
+        "responses": {
+          "200": {
+            "description": "Órdenes obtenidas correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Listar órdenes de compra",
+        "description": "Obtiene todas las órdenes de compra. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/ordenes-compra/{id}": {
+      "get": {
+        "tags": [
+          "Órdenes de compra"
+        ],
+        "operationId": "obtener_4",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Identificador de la orden",
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orden encontrada",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          },
+          "404": {
+            "description": "Orden no encontrada"
+          }
+        },
+        "summary": "Obtener orden de compra",
+        "description": "Obtiene una orden por su identificador. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/ordenes-compra/pendientes": {
+      "get": {
+        "tags": [
+          "Órdenes de compra"
+        ],
+        "operationId": "pendientes",
+        "responses": {
+          "200": {
+            "description": "Órdenes pendientes obtenidas correctamente",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionModelEntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o inválido"
+          },
+          "403": {
+            "description": "Se requiere ROLE_ADMIN"
+          }
+        },
+        "summary": "Listar órdenes pendientes",
+        "description": "Obtiene las órdenes que aún requieren recepción o cancelación. Requiere ROLE_ADMIN."
+      }
+    },
+    "/api/inventario/{id}": {
+      "get": {
+        "tags": [
+          "Inventario"
+        ],
+        "summary": "Obtener movimiento",
+        "description": "Busca un movimiento por su identificador.",
+        "operationId": "obtenerMovimientoPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Identificador del movimiento",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Movimiento encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventario"
+                },
+                "example": {
+                  "id": 1,
+                  "producto": {
+                    "id": 1,
+                    "nombre": "Arroz 1 kg",
+                    "precio": 1890.0,
+                    "stock": 40,
+                    "categoria": {
+                      "id": 1,
+                      "nombre": "Abarrotes"
+                    }
+                  },
+                  "cantidad": 40,
+                  "tipoMovimiento": "ENTRADA",
+                  "fechaMovimiento": "2026-07-13T20:00:00.000+00:00",
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/inventario/1"
+                    },
+                    "inventario": {
+                      "href": "http://localhost:8080/api/inventario"
+                    },
+                    "producto": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Movimiento no encontrado"
+          }
+        }
+      }
+    },
+    "/api/detalle-ventas": {
+      "get": {
+        "tags": [
+          "Detalle de ventas"
+        ],
+        "summary": "Listar detalles de venta",
+        "description": "Obtiene los detalles de venta con enlaces HATEOAS.",
+        "operationId": "listarDetalleVentas",
+        "responses": {
+          "200": {
+            "description": "Detalles obtenidos correctamente",
+            "content": {
+              "application/hal+json": {}
+            }
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          }
+        }
+      }
+    },
+    "/api/detalle-ventas/{id}": {
+      "get": {
+        "tags": [
+          "Detalle de ventas"
+        ],
+        "summary": "Obtener detalle de venta",
+        "description": "Busca un detalle de venta por su identificador.",
+        "operationId": "obtenerDetalleVentaPorId",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalle encontrado",
+            "content": {
+              "application/hal+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DetalleVenta"
+                },
+                "example": {
+                  "id": 1,
+                  "producto": {
+                    "id": 1,
+                    "nombre": "Arroz 1 kg",
+                    "precio": 1890.0,
+                    "stock": 38
+                  },
+                  "cantidad": 2,
+                  "precio": 3780.0,
+                  "_links": {
+                    "self": {
+                      "href": "http://localhost:8080/api/detalle-ventas/1"
+                    },
+                    "detalle-ventas": {
+                      "href": "http://localhost:8080/api/detalle-ventas"
+                    },
+                    "producto": {
+                      "href": "http://localhost:8080/api/productos/1"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Token ausente o invalido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Detalle no encontrado"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Rol": {
+        "type": "object",
+        "description": "Rol de autorización asignado a un usuario.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del rol",
+            "example": 1,
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre del rol",
+            "example": "ROLE_CLIENTE"
+          }
+        }
+      },
+      "Usuario": {
+        "type": "object",
+        "description": "Usuario registrado en MiniMarket Plus.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del usuario",
+            "example": 2,
+            "readOnly": true
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de acceso",
+            "example": "cliente"
+          },
+          "correo": {
+            "type": "string",
+            "description": "Correo electrónico del usuario",
+            "example": "cliente@minimarket.local"
+          },
+          "password": {
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "cliente123",
+            "writeOnly": true
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles asignados al usuario",
+            "items": {
+              "$ref": "#/components/schemas/Rol"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "EntityModelUsuario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del usuario",
+            "example": 2,
+            "readOnly": true
+          },
+          "username": {
+            "type": "string",
+            "description": "Nombre de acceso",
+            "example": "cliente"
+          },
+          "correo": {
+            "type": "string",
+            "description": "Correo electrónico del usuario",
+            "example": "cliente@minimarket.local"
+          },
+          "password": {
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "cliente123",
+            "writeOnly": true
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles asignados al usuario",
+            "items": {
+              "$ref": "#/components/schemas/Rol"
+            },
+            "uniqueItems": true
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Sucursal": {
+        "type": "object",
+        "description": "Sucursal de MiniMarket Plus.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "activa": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EntityModelSucursal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "direccion": {
+            "type": "string"
+          },
+          "activa": {
+            "type": "boolean"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Proveedor": {
+        "type": "object",
+        "description": "Proveedor utilizado para las órdenes de compra.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "correo": {
+            "type": "string"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "activo": {
+            "type": "boolean"
+          }
+        }
+      },
+      "EntityModelProveedor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "correo": {
+            "type": "string"
+          },
+          "telefono": {
+            "type": "string"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PromocionRequest": {
+        "type": "object",
+        "description": "Datos de una promoción centralizada.",
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "productoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "porcentajeDescuento": {
+            "type": "number",
+            "format": "double"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date"
+          },
+          "activa": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Categoria": {
+        "type": "object",
+        "description": "Categoría utilizada para clasificar productos.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador de la categoría",
+            "example": 1,
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre de la categoría",
+            "example": "Abarrotes"
+          }
+        }
+      },
+      "EntityModelPromocion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "porcentajeDescuento": {
+            "type": "number",
+            "format": "double"
+          },
+          "fechaInicio": {
+            "type": "string",
+            "format": "date"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date"
+          },
+          "activa": {
+            "type": "boolean"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Producto": {
+        "type": "object",
+        "description": "Producto disponible en MiniMarket Plus.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del producto",
+            "example": 1,
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre comercial",
+            "example": "Arroz 1 kg"
+          },
+          "precio": {
+            "type": "number",
+            "format": "double",
+            "description": "Precio unitario",
+            "example": 1890.0
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Stock disponible",
+            "example": 40
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/Categoria",
+            "description": "Categoría asociada al producto"
+          }
+        }
+      },
+      "EntityModelProducto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del producto",
+            "example": 1,
+            "readOnly": true
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre comercial",
+            "example": "Arroz 1 kg"
+          },
+          "precio": {
+            "type": "number",
+            "format": "double",
+            "description": "Precio unitario",
+            "example": 1890.0
+          },
+          "stock": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Stock disponible",
+            "example": 40
+          },
+          "categoria": {
+            "$ref": "#/components/schemas/Categoria",
+            "description": "Categoría asociada al producto"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PedidoEstadoRequest": {
+        "type": "object",
+        "description": "Cambio de estado administrativo de un pedido.",
+        "properties": {
+          "estado": {
+            "type": "string"
+          }
+        }
+      },
+      "EntityModelPedido": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/Usuario"
+          },
+          "sucursal": {
+            "$ref": "#/components/schemas/Sucursal"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tipoEntrega": {
+            "type": "string"
+          },
+          "direccionDespacho": {
+            "type": "string"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number",
+            "format": "double"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Carrito": {
+        "type": "object",
+        "description": "Producto agregado al carrito de un usuario.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del registro",
+            "example": 1,
+            "readOnly": true
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/Usuario",
+            "description": "Usuario propietario del carrito"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto",
+            "description": "Producto agregado"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Cantidad del producto",
+            "example": 2
+          }
+        }
+      },
+      "EntityModelCarrito": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del registro",
+            "example": 1,
+            "readOnly": true
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/Usuario",
+            "description": "Usuario propietario del carrito"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto",
+            "description": "Producto agregado"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Cantidad del producto",
+            "example": 2
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "DetalleVentaRequest": {
+        "type": "object",
+        "description": "Producto y cantidad solicitados en una venta",
+        "properties": {
+          "productoId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2
+          }
+        },
+        "required": [
+          "cantidad",
+          "productoId"
+        ]
+      },
+      "VentaRequest": {
+        "type": "object",
+        "description": "Solicitud de venta. El usuario se obtiene del token autenticado.",
+        "properties": {
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetalleVentaRequest"
+            }
+          }
+        },
+        "required": [
+          "detalles"
+        ]
+      },
+      "Venta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "usuario": {
+            "$ref": "#/components/schemas/Usuario"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StockSucursalRequest": {
+        "type": "object",
+        "description": "Movimiento de stock para una sucursal.",
+        "properties": {
+          "sucursalId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "productoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tipoMovimiento": {
+            "type": "string"
+          },
+          "stockMinimo": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "EntityModelStockSucursal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "sucursal": {
+            "$ref": "#/components/schemas/Sucursal"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "stockActual": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stockMinimo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "StockSucursal": {
+        "type": "object",
+        "description": "Stock de un producto en una sucursal específica.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "sucursal": {
+            "$ref": "#/components/schemas/Sucursal"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "stockActual": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stockMinimo": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "DetallePedidoRequest": {
+        "type": "object",
+        "description": "Producto y cantidad solicitados en un pedido.",
+        "properties": {
+          "productoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PedidoRequest": {
+        "type": "object",
+        "description": "Solicitud de pedido en línea.",
+        "properties": {
+          "sucursalId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "tipoEntrega": {
+            "type": "string"
+          },
+          "direccionDespacho": {
+            "type": "string"
+          },
+          "detalles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetallePedidoRequest"
+            }
+          }
+        }
+      },
+      "EntityModelOrdenCompra": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "sucursal": {
+            "$ref": "#/components/schemas/Sucursal"
+          },
+          "proveedor": {
+            "$ref": "#/components/schemas/Proveedor"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "automatica": {
+            "type": "boolean"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "OrdenCompra": {
+        "type": "object",
+        "description": "Orden de compra generada para reponer stock de una sucursal.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "sucursal": {
+            "$ref": "#/components/schemas/Sucursal"
+          },
+          "proveedor": {
+            "$ref": "#/components/schemas/Proveedor"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fechaCreacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estado": {
+            "type": "string"
+          },
+          "automatica": {
+            "type": "boolean"
+          }
+        }
+      },
+      "InventarioRequest": {
+        "type": "object",
+        "description": "Solicitud de movimiento de inventario",
+        "properties": {
+          "productoId": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "example": 10
+          },
+          "tipoMovimiento": {
+            "type": "string",
+            "enum": [
+              "ENTRADA",
+              "SALIDA"
+            ],
+            "example": "ENTRADA"
+          }
+        },
+        "required": [
+          "cantidad",
+          "productoId",
+          "tipoMovimiento"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "description": "Datos públicos para registrar una cuenta cliente",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "nuevoCliente"
+          },
+          "correo": {
+            "type": "string",
+            "example": "nuevo.cliente@minimarket.local"
+          },
+          "password": {
+            "type": "string",
+            "example": "cliente123"
+          },
+          "roles": {
+            "type": "array",
+            "description": "Roles solicitados. El registro público solo acepta ROLE_CLIENTE.",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "correo",
+          "password",
+          "username"
+        ]
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "description": "Cuenta cliente registrada",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 4
+          },
+          "username": {
+            "type": "string",
+            "example": "nuevoCliente"
+          },
+          "correo": {
+            "type": "string",
+            "example": "nuevo.cliente@minimarket.local"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "description": "Credenciales para obtener un token JWT",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "example": "admin123"
+          }
+        },
+        "required": [
+          "password",
+          "username"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "description": "Token JWT generado después de autenticar al usuario",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token firmado"
+          },
+          "tokenType": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "format": "int64",
+            "example": 3600
+          },
+          "username": {
+            "type": "string",
+            "example": "admin"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CollectionModelEntityModelSucursal": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "sucursalList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelSucursal"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelEntityModelStockSucursal": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "stockSucursalList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelStockSucursal"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "DisponibilidadSucursalResponse": {
+        "type": "object",
+        "properties": {
+          "sucursalId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sucursal": {
+            "type": "string"
+          },
+          "productoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "producto": {
+            "type": "string"
+          },
+          "stockActual": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stockMinimo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "disponible": {
+            "type": "boolean"
+          }
+        }
+      },
+      "RotacionProductoResponse": {
+        "type": "object",
+        "properties": {
+          "productoId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "producto": {
+            "type": "string"
+          },
+          "unidadesVendidas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unidadesPedidas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalMovido": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CollectionModelEntityModelProveedor": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "proveedorList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelProveedor"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelEntityModelPromocion": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "promocionList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelPromocion"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelEntityModelPedido": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "pedidoList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelPedido"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelEntityModelDetallePedido": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "detallePedidoList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelDetallePedido"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EntityModelDetallePedido": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "readOnly": true
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "precioUnitario": {
+            "type": "number",
+            "format": "double"
+          },
+          "subtotal": {
+            "type": "number",
+            "format": "double"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelEntityModelOrdenCompra": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "ordenCompraList": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelOrdenCompra"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "Inventario": {
+        "type": "object",
+        "description": "Movimiento de entrada o salida de stock.",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Identificador del movimiento",
+            "example": 1,
+            "readOnly": true
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto",
+            "description": "Producto afectado"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Cantidad registrada",
+            "example": 40
+          },
+          "tipoMovimiento": {
+            "type": "string",
+            "description": "Tipo de movimiento",
+            "enum": [
+              "ENTRADA",
+              "SALIDA"
+            ],
+            "example": "ENTRADA"
+          },
+          "fechaMovimiento": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha y hora del movimiento",
+            "example": "2026-07-13T20:00:00.000+00:00"
+          }
+        }
+      },
+      "DetalleVenta": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "producto": {
+            "$ref": "#/components/schemas/Producto"
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "precio": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Link": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": "string"
+          },
+          "hreflang": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "deprecation": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "templated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Links": {
+        "type": "object",
+        "additionalProperties": {
+          "$ref": "#/components/schemas/Link"
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "description": "Ingrese únicamente el token generado por POST /api/auth/login.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
